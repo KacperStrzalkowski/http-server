@@ -8,6 +8,7 @@ mod models;
 
 use models::Request;
 use models::get_routing;
+use models::Response;
 
 fn handle_connection(mut stream: TcpStream, router_map: &HashMap<String, PathBuf>) -> Result<(), std::io::Error>{
     let mut stream_reader = BufReader::new(&mut stream);
@@ -21,19 +22,14 @@ fn handle_connection(mut stream: TcpStream, router_map: &HashMap<String, PathBuf
     .map_err(|e| std::io::Error::new(std::io::ErrorKind::InvalidData, e))?;
 
     let file_requested_by_path = router_map.get(&request.path[1..]).ok_or(std::io::Error::new(std::io::ErrorKind::InvalidData, "InvalidData"))?;
-    let mut file = File::open(file_requested_by_path)?;
+    let file = File::open(file_requested_by_path)?;
 
-    let mut body = String::new();
+    let response = Response::new("HTTP", file)    
+    .map_err(|e| std::io::Error::new(std::io::ErrorKind::InvalidData, e))?;
 
-    file.read_to_string(&mut body)?;
+    response.send(&mut stream)?;
 
-    let response = format!(
-        "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\nContent-Length: {}\r\n\r\n{}",
-        body.len(),
-        body
-    );
-    
-    stream.write(response.as_bytes())?;
+
     return Ok(());
 }
 
