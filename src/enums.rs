@@ -16,21 +16,35 @@ impl Method {
 }
 
 
-pub enum ResponseHeader {
-    HTTP(HttpStatus)
+pub enum ContentType {
+    HTML,
+    CSS,
+    JS,
+    PLAIN
 }
 
-impl ResponseHeader {
-    pub fn from_str(s: &str, status: HttpStatus) -> Option<ResponseHeader> {
+impl ContentType {
+    pub fn from_str(s: &str) -> ContentType {
         match s {
-            "HTTP" => Some(ResponseHeader::HTTP(status)),
-            _ => None
+            "html" => ContentType::HTML,
+            "css" => ContentType::CSS,
+            "js" => ContentType::JS,
+            _ => ContentType::PLAIN
         }
     }
 
-    pub fn get_header_str(&self) -> String {
+    
+    pub fn get_header_str(&self, status: &HttpStatus) -> String {
+        let status = status.get_status_str();
+        return format!("HTTP/1.1 {}\r\nContent-Type: {}\r\nContent-Length: ", status, self.get_content_type_str());
+    }
+    
+    fn get_content_type_str(&self) -> String {
         match self {
-            ResponseHeader::HTTP(val) => format!("HTTP/1.1 {}\r\nContent-Type: text/html\r\nContent-Length: ", val.get_status_str()),
+            ContentType::HTML => "text/html".to_string(),
+            ContentType::CSS => "text/css".to_string(),
+            ContentType::JS => "application/javascript".to_string(),
+            ContentType::PLAIN => "text/plain".to_string(),
         }
     }
 }

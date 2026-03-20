@@ -1,7 +1,6 @@
 use std::net::{TcpListener, TcpStream};
-use std::io::{BufRead, BufReader, Write, Read};
+use std::io::{BufRead, BufReader};
 use std::path::PathBuf;
-use std::fs::File;
 use std::collections::HashMap;
 mod enums;
 mod models;
@@ -21,7 +20,7 @@ fn handle_connection(mut stream: TcpStream, router_map: &HashMap<String, PathBuf
     let request: Request = Request::new(request_line)
         .map_err(|e| std::io::Error::new(std::io::ErrorKind::InvalidData, e))?;
 
-    let response = Response::new("HTTP", &request.path[1..], &router_map)    
+    let response = Response::new(&request.path[1..], &router_map)    
         .map_err(|e| std::io::Error::new(std::io::ErrorKind::InvalidData, e))?;
 
     response.send(&mut stream)?;

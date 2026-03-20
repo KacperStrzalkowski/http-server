@@ -20,11 +20,16 @@ pub fn get_routing() -> Result<HashMap<String, PathBuf>, std::io::Error> {
             let path_name = entry.file_name().into_string().expect("Invalid file name");
             let path_vec: Vec<&str> = path_name.split(".").collect();
             let path_name: String;
-            if path_vec[path_vec.len() - 1] == "html" {
-                path_name = path_vec[..path_vec.len()-1].join(".");
+            if let Some(ext) = path_vec.last() {
+                if *ext == "html" {
+                    path_name = path_vec[..path_vec.len()-1].join(".");
+                }
+                else {
+                    path_name = path_vec.join(".")
+                }
             }
             else {
-                path_name = path_vec.join(".")
+                continue;
             }
 
             let file_path = folder_path.join("html").join(entry.file_name());
@@ -35,14 +40,3 @@ pub fn get_routing() -> Result<HashMap<String, PathBuf>, std::io::Error> {
     return Ok(router_map);
 }
 
-#[derive(Debug)]
-pub enum RouterError {
-    InvalidFileName
-}
-
-impl std::error::Error for RouterError {}
-impl std::fmt::Display for RouterError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{:?}", self)
-    }
-}

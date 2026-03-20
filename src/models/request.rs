@@ -1,7 +1,7 @@
 use crate::enums::Method;
 #[derive(Debug)]
 pub struct Request {
-    pub method: Method,
+    pub _method: Method,
     pub path: String,
 }
 
@@ -15,7 +15,7 @@ impl Request {
         let path = parts.next().ok_or(ParseError::MissingPath)?.to_string();
         
         return Ok(Self {
-            method: method,
+            _method: method,
             path: path,
         })
     }

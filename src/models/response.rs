@@ -1,17 +1,17 @@
-use crate::enums::{HttpStatus, ResponseHeader};
+use crate::enums::{ContentType, HttpStatus};
 use std::collections::HashMap;
 use std::io::Write;
 use std::net::TcpStream;
 use std::path::PathBuf;
 use std::{fs::File, io::Read};
 pub struct Response {
-    response_header: ResponseHeader,
+    response_header: ContentType,
+    http_status: HttpStatus,
     body_context: String,
 }
 
 impl Response {
     pub fn new(
-        response_header: &str,
         requested_path: &str,
         router_map: &HashMap<String, PathBuf>,
     ) -> Result<Self, ResponseError> {
@@ -20,8 +20,14 @@ impl Response {
             None => FileResult::NotFound("404 Not Found".to_string()),
         };
         let http_status;
+        let response_header;
         let body_context = match requested_file {
             FileResult::Found(path) => {
+                response_header = path.extension()
+                    .and_then(|e| e.to_str())
+                    .map(ContentType::from_str)
+                    .unwrap_or(ContentType::PLAIN);
+
                 let mut file = File::open(path).map_err(|_| ResponseError::InvalidFile)?;
 
                 let mut contents = String::new();
@@ -33,21 +39,20 @@ impl Response {
             }
             FileResult::NotFound(val) => {
                 http_status = HttpStatus::NotFound404;
+                response_header = ContentType::PLAIN;
                 val
             }
         };
-        let response_header: ResponseHeader =
-            ResponseHeader::from_str(&response_header, http_status)
-                .ok_or(ResponseError::InvalidHeader)?;
 
         return Ok(Self {
             response_header,
+            http_status,
             body_context,
         });
     }
 
     pub fn send(&self, stream: &mut TcpStream) -> Result<(), std::io::Error> {
-        let response_header_string = self.response_header.get_header_str();
+        let response_header_string = self.response_header.get_header_str(&self.http_status);
         let body = &self.body_context;
 
         let response_body_string =
@@ -59,7 +64,6 @@ impl Response {
 
 #[derive(Debug)]
 pub enum ResponseError {
-    InvalidHeader,
     InvalidFile,
 }
 
