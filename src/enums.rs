@@ -1,8 +1,7 @@
-
 #[derive(Debug)]
 pub enum Method {
     GET,
-    POST
+    POST,
 }
 
 impl Method {
@@ -10,17 +9,16 @@ impl Method {
         match s {
             "GET" => Some(Method::GET),
             "POST" => Some(Method::POST),
-            _ => None
+            _ => None,
         }
     }
 }
-
 
 pub enum ContentType {
     Html,
     Css,
     Js,
-    Plain
+    Plain,
 }
 
 impl ContentType {
@@ -29,16 +27,19 @@ impl ContentType {
             "html" => ContentType::Html,
             "css" => ContentType::Css,
             "js" => ContentType::Js,
-            _ => ContentType::Plain
+            _ => ContentType::Plain,
         }
     }
 
-    
     pub fn get_header_str(&self, status: &HttpStatus) -> String {
         let status = status.get_status_str();
-        return format!("HTTP/1.1 {}\r\nContent-Type: {}\r\nContent-Length: ", status, self.get_content_type_str());
+        return format!(
+            "HTTP/1.1 {}\r\nContent-Type: {}\r\nContent-Length: ",
+            status,
+            self.get_content_type_str()
+        );
     }
-    
+
     fn get_content_type_str(&self) -> String {
         match self {
             ContentType::Html => "text/html".to_string(),
@@ -51,7 +52,7 @@ impl ContentType {
 
 pub enum HttpStatus {
     Ok200,
-    NotFound404
+    NotFound404,
 }
 
 impl HttpStatus {

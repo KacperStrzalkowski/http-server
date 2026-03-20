@@ -23,7 +23,8 @@ impl Response {
         let response_header;
         let body_context = match requested_file {
             FileResult::Found(path) => {
-                response_header = path.extension()
+                response_header = path
+                    .extension()
                     .and_then(|e| e.to_str())
                     .map(ContentType::from_str)
                     .unwrap_or(ContentType::Plain);
