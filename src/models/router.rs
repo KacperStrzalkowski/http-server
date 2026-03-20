@@ -18,11 +18,14 @@ pub fn get_routing() -> Result<HashMap<String, PathBuf>, std::io::Error> {
         
         if path.is_file() {
             let path_name = entry.file_name().into_string().expect("Invalid file name");
-            let mut path_name = path_name.split(".");
-            let path_name = path_name.next()
-                                            .ok_or(RouterError::InvalidFileName)
-                                            .map_err(|e|std::io::Error::new(std::io::ErrorKind::InvalidFilename, e))?
-                                            .to_string();
+            let path_vec: Vec<&str> = path_name.split(".").collect();
+            let path_name: String;
+            if path_vec[path_vec.len() - 1] == "html" {
+                path_name = path_vec[..path_vec.len()-1].join(".");
+            }
+            else {
+                path_name = path_vec.join(".")
+            }
 
             let file_path = folder_path.join("html").join(entry.file_name());
             router_map.entry(path_name).or_insert(file_path);

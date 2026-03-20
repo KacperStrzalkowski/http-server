@@ -19,13 +19,10 @@ fn handle_connection(mut stream: TcpStream, router_map: &HashMap<String, PathBuf
     
     println!("{request_line}");
     let request: Request = Request::new(request_line)
-    .map_err(|e| std::io::Error::new(std::io::ErrorKind::InvalidData, e))?;
+        .map_err(|e| std::io::Error::new(std::io::ErrorKind::InvalidData, e))?;
 
-    let file_requested_by_path = router_map.get(&request.path[1..]).ok_or(std::io::Error::new(std::io::ErrorKind::InvalidData, "InvalidData"))?;
-    let file = File::open(file_requested_by_path)?;
-
-    let response = Response::new("HTTP", file)    
-    .map_err(|e| std::io::Error::new(std::io::ErrorKind::InvalidData, e))?;
+    let response = Response::new("HTTP", &request.path[1..], &router_map)    
+        .map_err(|e| std::io::Error::new(std::io::ErrorKind::InvalidData, e))?;
 
     response.send(&mut stream)?;
 

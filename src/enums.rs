@@ -17,21 +17,34 @@ impl Method {
 
 
 pub enum ResponseHeader {
-    HTTP
+    HTTP(HttpStatus)
 }
 
 impl ResponseHeader {
-    pub fn from_str(s: &str) -> Option<ResponseHeader> {
+    pub fn from_str(s: &str, status: HttpStatus) -> Option<ResponseHeader> {
         match s {
-            "HTTP" => Some(ResponseHeader::HTTP),
+            "HTTP" => Some(ResponseHeader::HTTP(status)),
             _ => None
         }
     }
 
     pub fn get_header_str(&self) -> String {
         match self {
-            ResponseHeader::HTTP => "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\nContent-Length: ".to_string(),
-            _ => "".to_string(),
+            ResponseHeader::HTTP(val) => format!("HTTP/1.1 {}\r\nContent-Type: text/html\r\nContent-Length: ", val.get_status_str()),
+        }
+    }
+}
+
+pub enum HttpStatus {
+    Ok200,
+    NotFound404
+}
+
+impl HttpStatus {
+    pub fn get_status_str(&self) -> String {
+        match self {
+            HttpStatus::Ok200 => "200 OK".to_string(),
+            HttpStatus::NotFound404 => "404 Not Found".to_string(),
         }
     }
 }
