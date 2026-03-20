@@ -17,19 +17,19 @@ impl Method {
 
 
 pub enum ContentType {
-    HTML,
-    CSS,
-    JS,
-    PLAIN
+    Html,
+    Css,
+    Js,
+    Plain
 }
 
 impl ContentType {
     pub fn from_str(s: &str) -> ContentType {
         match s {
-            "html" => ContentType::HTML,
-            "css" => ContentType::CSS,
-            "js" => ContentType::JS,
-            _ => ContentType::PLAIN
+            "html" => ContentType::Html,
+            "css" => ContentType::Css,
+            "js" => ContentType::Js,
+            _ => ContentType::Plain
         }
     }
 
@@ -41,10 +41,10 @@ impl ContentType {
     
     fn get_content_type_str(&self) -> String {
         match self {
-            ContentType::HTML => "text/html".to_string(),
-            ContentType::CSS => "text/css".to_string(),
-            ContentType::JS => "application/javascript".to_string(),
-            ContentType::PLAIN => "text/plain".to_string(),
+            ContentType::Html => "text/html".to_string(),
+            ContentType::Css => "text/css".to_string(),
+            ContentType::Js => "application/javascript".to_string(),
+            ContentType::Plain => "text/plain".to_string(),
         }
     }
 }

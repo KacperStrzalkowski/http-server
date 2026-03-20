@@ -26,7 +26,7 @@ impl Response {
                 response_header = path.extension()
                     .and_then(|e| e.to_str())
                     .map(ContentType::from_str)
-                    .unwrap_or(ContentType::PLAIN);
+                    .unwrap_or(ContentType::Plain);
 
                 let mut file = File::open(path).map_err(|_| ResponseError::InvalidFile)?;
 
@@ -39,7 +39,7 @@ impl Response {
             }
             FileResult::NotFound(val) => {
                 http_status = HttpStatus::NotFound404;
-                response_header = ContentType::PLAIN;
+                response_header = ContentType::Plain;
                 val
             }
         };
