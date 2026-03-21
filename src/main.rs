@@ -26,6 +26,7 @@ fn handle_connection(
         .map_err(|e| std::io::Error::new(std::io::ErrorKind::InvalidData, e))?;
 
     response.send(&mut stream)?;
+    drop(stream);
 
     return Ok(());
 }

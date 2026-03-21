@@ -35,6 +35,9 @@ impl Response {
 
                 file.read_to_string(&mut contents)
                     .map_err(|_| ResponseError::InvalidFile)?;
+
+                drop(file);
+
                 http_status = HttpStatus::Ok200;
                 contents
             }
