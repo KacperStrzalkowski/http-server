@@ -25,16 +25,11 @@ pub fn get_routing() -> Result<HashMap<String, PathBuf>, std::io::Error> {
                 continue;
             };
             let path_vec: Vec<&str> = path_name.split(".").collect();
-            let path_name: String;
-            if let Some(ext) = path_vec.last() {
-                if *ext == "html" {
-                    path_name = path_vec[..path_vec.len() - 1].join(".");
-                } else {
-                    path_name = path_vec.join(".")
-                }
-            } else {
-                continue;
-            }
+            let path_name = match path_vec.last() {
+                Some(ext) if *ext == "html" => path_vec[..path_vec.len() - 1].join("."),
+                Some(_) => path_vec.join("."),
+                None => continue,
+            };
 
             let file_path = folder_path.join("html").join(entry.file_name());
             router_map.entry(path_name).or_insert(file_path);
